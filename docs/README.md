@@ -21,7 +21,6 @@
 - :x: due to this workaround, the engine EGT can go into read area when in (OP) CLB/DES (see workaround above)
 - :x: after a longer pause the custom autopilot system can go crazy
 - :x: due to lack of VNAV, DES mode is currently only using SPD/MACH
-- :x: CLB and DES do not respect altitude constraints (contraints are supported but are lacking proper input)
 - :x: Transitions might not be as they should
 - :x: FD off/on does not deactivate all FMA items
 - :x: Engagement of AP with FD off is incorrect
@@ -32,10 +31,12 @@
 - :x: AP performance when flying turbulence might not be satisfying
 - :x: AP is not disconnected due to pilot input (sidestick, rudder) or turbulence
 - :x: FMA or engagement of AP when changing position with slew might be wrong
+- :x: Flight Director (FD) guidance in pitch is not satisfying yet
 
 #### First implementation available
 - :small_orange_diamond: Principle go-around mode has been added but not all conditions are respected yet
 - :small_orange_diamond: NAV mode is for the time being using default flight plan manager until the custom is ready
+- :small_orange_diamond: altitude constraints seem to work with CLB and DES (there are many situations out there, so there can still be unknown bugs)
 
 #### Considered solved
 

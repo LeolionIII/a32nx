@@ -3,12 +3,14 @@ import {
     calculateVerticalOffsetFromRoll,
     getSmallestAngle,
     HorizontalTape,
+    LagFilter,
 } from './PFDUtils.jsx';
 import { getSimVar } from '../util.mjs';
 
 const DisplayRange = 35;
 const DistanceSpacing = 15;
 const ValueSpacing = 10;
+const SideslipIndicatorFilter = new LagFilter(0.8);
 
 const TickFunction = (heading, offset) => (
     <path transform={`translate(${offset} 0)`} className="NormalStroke White" d="m68.906 80.823v1.8" />
@@ -22,7 +24,7 @@ const HeadingBug = (offset) => (
 );
 
 export const Horizon = ({
-    pitch, roll, heading, isOnGround, radioAlt, decisionHeight, selectedHeading, FDActive, isAttExcessive,
+    pitch, roll, heading, isOnGround, radioAlt, decisionHeight, selectedHeading, FDActive, isAttExcessive, deltaTime,
 }) => {
     if (!getSimVar('L:A32NX_ADIRS_PFD_ALIGNED_ATT', 'Bool')) {
         return null;
@@ -126,7 +128,7 @@ export const Horizon = ({
             </g>
             <path d="m40.952 49.249v-20.562h55.908v20.562z" className="NormalOutline SkyFill" />
             <path d="m40.952 49.249v-20.562h55.908v20.562z" className="NormalStroke White" />
-            <SideslipIndicator isOnGround={isOnGround} roll={roll} />
+            <SideslipIndicator isOnGround={isOnGround} roll={roll} deltaTime={deltaTime} />
             <RisingGround radioAlt={radioAlt} pitch={pitch} />
             {headingAvail
             && <HorizontalTape graduationElementFunction={TickFunction} bugs={bugs} yOffset={yOffset} displayRange={DisplayRange} distanceSpacing={DistanceSpacing} valueSpacing={ValueSpacing} heading={heading} />}
@@ -250,7 +252,7 @@ const RadioAltAndDH = ({ radioAlt, decisionHeight, roll }) => {
     return null;
 };
 
-const SideslipIndicator = ({ isOnGround, roll }) => {
+const SideslipIndicator = ({ isOnGround, roll, deltaTime }) => {
     let SIIndexOffset = 0;
 
     const verticalOffset = calculateVerticalOffsetFromRoll(roll);
@@ -263,6 +265,8 @@ const SideslipIndicator = ({ isOnGround, roll }) => {
     } else {
         SIIndexOffset = Math.max(Math.min(getSimVar('INCIDENCE BETA', 'degrees'), 15), -15);
     }
+
+    SIIndexOffset = SideslipIndicatorFilter.step(SIIndexOffset, deltaTime / 1000);
 
     return (
         <g id="RollTriangleGroup" transform={`translate(0 ${verticalOffset})`} className="NormalStroke Yellow CornerRound">
